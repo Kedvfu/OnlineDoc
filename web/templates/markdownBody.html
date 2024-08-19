@@ -1,0 +1,24 @@
+{{ define "markdownBody" }}
+<div class="document-container">
+    <div class="document-editor">
+        <div id="document-toolbar">
+            <div id="document-toolbar-buttons">
+
+            </div>
+        </div>
+        <div id="document-content-container">
+            <label for="document-content"></label>
+            <textarea id="document-content" aria-label="Document content"></textarea>
+        </div>
+    </div>
+    <div class="document-viewer">
+        <div id="document-viewer-container">
+
+        </div>
+    </div>
+
+</div>
+<script src="/web/assets/js/markdown/markdown.js"></script>
+<script src="/web/assets/js/markdown/markdown.min.js"></script>
+<script src="/web/assets/js/markdownEditor.js"></script>
+{{end}}

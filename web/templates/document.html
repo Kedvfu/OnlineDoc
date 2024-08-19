@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        var pageData = {
+            title: {{ .title}},
+            userId: {{ .user_id  }},
+            documentId: {{ .document_id }},
+            permissionType: {{ .permissionType  }},
+            documentType: {{ .documentType  }},
+        }
+    </script>
+    <title>{{.title}}</title>
+    {{ template "head" }}
+</head>
+<body>
+{{ template "documentHeader" . }}
+{{ if  eq .documentType 1 }}
+{{ template "markdownBody" . }}
+{{end}}
+{{ if  eq .documentType 2 }}
+{{ template "excelBody" . }}
+{{end}}
+{{ template "footer"  }}
+</body>
+</html>

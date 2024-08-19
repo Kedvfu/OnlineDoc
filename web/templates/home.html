@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    var pageData = {
+      "user_id": {{.user_id }},
+    }
+  </script>
+  <title>主页</title>
+  {{ template "head" }}
+</head>
+<body>
+{{ template "navbar" .}}
+{{ if .session_token }}
+<div id="document-list">
+  <a href="/document/new/markdown">新建markdown文档</a>
+  <a href="/document/new/excel">新建excel文档</a>
+</div>
+
+
+<script src="/web/assets/js/getUserDocument.js"></script>
+{{ end }}
+{{ template "footer" }}
+</body>
+
+</html>

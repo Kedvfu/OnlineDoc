@@ -1,0 +1,415 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.navbar-links {
+    display: flex;
+    list-style-type: none;
+
+}
+
+.navbar-link {
+    margin: 0 1rem;
+}
+
+.navbar-link a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-link  a:hover {
+    color: #007bff;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.login {
+    background-color: #007bff;
+    color: white;
+}
+
+.login:hover {
+    background-color: #0056b3;
+}
+
+.register {
+    background-color: #28a745;
+    color: white;
+}
+
+.register:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul {
+        flex-direction: column;
+        margin-top: 1rem;
+    }
+
+    nav ul li {
+        margin: 0.5rem 0;
+    }
+
+    .auth-buttons {
+        margin-top: 1rem;
+        align-self: stretch;
+    }
+
+    .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+
+/*document 界面*/
+.document-header {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa; /* 背景颜色 */
+    color: #343a40; /* 文本颜色 */
+    padding: 10px 20px; /* 内边距 */
+    height: 60px; /* 固定高度 */
+}
+
+.document-info-bar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.document-info-bar-item {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+/* 左侧项目 */
+.document-info-bar-left-items {
+    display: flex;
+    align-items: center;
+}
+
+.document-info-bar-item-title {
+    font-size: 1.1em;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+/* 右侧项目 */
+.document-info-bar-right-items {
+    display: flex;
+    align-items: center;
+}
+
+/* SVG 图标样式 */
+.document-info-bar-item svg {
+    width: 24px;
+    height: 24px;
+    fill: none;/* 使用文本颜色填充图标 */
+    stroke: #597da2;
+    cursor: pointer;
+}
+.document-info-bar-item svg:hover {
+    fill: #597da2;
+}
+.document-info-bar-item-favourite .active {
+    fill: #ffda30;
+}
+.document-info-bar-item-userpage {
+    position: relative;
+}
+
+.document-info-bar-item-userpage::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 16px;
+    background-color: #6c757d;
+}
+#document-header-menu {
+    position: fixed; /* 固定位置 */
+    top: 60px;
+    width: 250px;
+    height: 100%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    transition: right 0.3s ease-in-out; /* 动画效果 */
+    z-index: 1000; /* 保证覆盖在其他内容之上 */
+    color: #000;
+}
+.menu-closed{
+    right: -250px; /* 初始位置在右侧看不见的位置 */
+}
+.menu-open{
+    right: 0; /* 打开菜单时，向右移动 */
+}
+#document-header-menu-item-share-link{
+    white-space: nowrap;
+    overflow-x: auto;
+    resize: none;
+    font-size: 14px;
+    height: 16px;
+}
+#document-header-menu-item-share-link::-webkit-scrollbar{
+    display: none;
+}
+
+
+
+
+/*markdown 窗口*/
+.document-container {
+    display: flex;
+}
+.document-container > div {
+    flex: 1;
+    margin: 5px;
+    height: 800px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    max-width: 50%;
+
+}
+.document-editor {
+    display: flex;
+    flex-direction: column;
+}
+#document-toolbar {
+    width: 100%;
+    height: 30px;
+}
+#document-content-container{
+
+    height: 100%;
+}
+#document-content {
+    border: 1px solid gray;
+    border-radius: 0 0 5px 5px;
+    resize: none;
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+}
+#document-viewer-container {
+    height: 100%;
+    overflow: auto;
+    word-break: break-all;
+}
+
+
+/*markdown 输出样式*/
+
+.code-window {
+    width: 90%;
+    border: 1px solid grey;
+    border-radius: 10px;
+    background-color: #424454;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.code-header {
+    display: flex;
+    border: 1px solid #424454;
+    border-radius: 10px;
+    background-color: #424454;
+    height: 32px;
+    align-items: center;
+    padding: 0 14px;
+}
+.code-title {
+    color: white;
+    font-size: 14px;
+    float: left;
+    font-weight: bold;
+    margin-right: auto;
+}
+.copy-button {
+
+    margin-right: 10px;
+    color: gray;
+}
+.copy-button:hover {
+    color: white;
+    cursor: pointer;
+}
+.copy-button svg {
+    width: 14px;
+    height: 14px;
+
+    fill: none;/* 使用文本颜色填充图标 */
+    stroke: currentColor;
+}
+.code-body {
+    background-color: #000;
+    overflow-x: auto;
+    display: flex;
+    border: 1px solid #424454;
+    border-radius: 10px;
+}
+.line-numbers {
+    color: #6a737d;
+
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    user-select: none;
+    font-size: 14px;
+    white-space: nowrap;
+}
+.code-line {
+    display: block;
+}
+.code-body pre {
+    margin: 0;
+    padding: 10px;
+}
+.code-body pre code {
+    color: #f2f3f7;
+    font-size: 14px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+
+
+/*excel 样式*/
+#excel-table{
+    border-collapse: collapse; /* 合并边框 */
+    user-select: none;
+    -webkit-user-select: none; /* 针对 WebKit 内核的浏览器 */
+    -moz-user-select: none; /* 针对 Firefox 浏览器 */
+    -ms-user-select: none; /* 针对 Internet Explorer/Edge */
+    user-drag: none;
+    -webkit-user-drag: none; /* 针对 WebKit 内核的浏览器 */
+    -moz-user-drag: none; /* 针对 Firefox 浏览器 */
+    -ms-user-drag: none; /* 针对 Internet Explorer/Edge */
+}
+.excel-data-cell,.excel-row-header-cell,.excel-column-header-cell {
+    border: 1px solid #adadad;
+    border-collapse: collapse;
+    position: relative;
+}
+.excel-row-header-cell,.excel-column-header-cell{
+    background-color: #88b9fd;
+}
+.excel-column-0 .excel-row-0 {
+    background-color: #6c757d;
+}
+.excel-column-0,.excel-row-0{
+
+}
+div.excel-column-0,div.excel-row-0{
+    display: flex;
+    justify-content: center;
+    user-select: none;
+}
+div.excel-data-cell:hover{
+    border: 3px solid #0079ff;
+}
+div.chosen-cell{
+    background-color: #c7e1ff;
+}
+div.chosen-cell.chosen-cell-selected{
+    background-color: #fff;
+}
+div.chosen-cell-selected{
+    border: 3px solid #0079ff;
+}
+div.chosen-cell-left{
+    border-left: 3px solid #0079ff;
+}
+div.chosen-cell-right{
+    border-right: 3px solid #0079ff;
+}
+div.chosen-cell-top{
+    border-top: 3px solid #0079ff;
+}
+div.chosen-cell-bottom {
+    border-bottom: 3px solid #0079ff;
+}
+.cell-textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    z-index: 1000;
+    resize: none;
+    font-family: 'SimHei', '黑体', 'Arial', sans-serif;
+
+    /*overflow: hidden;*/
+}
+.other-user-updated-cell{
+    position: absolute;
+    border: 2px solid #ff9023; /* 这是外框 */
+    pointer-events: none; /* 确保点击事件不会影响到其他元素 */
+    z-index: 1000;
+}
+.other-user-updated-cell-label{
+    position: absolute;
+    background-color: #ff9023;
+    color: white;
+    font-size: 12px;
+    top: -18px;
+    left: -1px;
+    padding: 1px 3px;
+    pointer-events: none;
+}
+.other-user-updated-cell-border {
+    opacity: 0;
+    background-color: #f00;
+    width: inherit;
+    height: inherit;
+    visibility: hidden;
+    z-index: 1000;
+    pointer-events: none;
+}
+.other-user-updated-cell-border:hover{
+    opacity: 0.3;
+    visibility: visible;
+}

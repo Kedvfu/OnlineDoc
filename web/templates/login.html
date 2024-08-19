@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页</title>
+
+    {{ template "head" }}
+
+</head>
+<body>
+{{ template "navbar" .}}
+    <h1>登录页</h1>
+    <form action="/login" id="loginForm" method="post">
+        <label for="username">用户名:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">密码:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+    </form>
+<button id="loginBtn">登录</button>
+<div id="error-message"></div>
+
+</body>
+<script src="/web/assets/js/login.js"></script>
+</html>
