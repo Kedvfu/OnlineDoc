@@ -4,6 +4,7 @@ import (
 	"OnlineDoc/api/handlers"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"time"
 )
 
 func UserAuthentication() gin.HandlerFunc {
@@ -23,6 +24,7 @@ func UserAuthentication() gin.HandlerFunc {
 			context.JSON(200, gin.H{
 				"message": "No user id, please login again",
 			})
+			context.Abort()
 		}
 		//documentId := context.Param("documentId")
 		sessionToken, err := context.Cookie("session_token")
@@ -30,6 +32,7 @@ func UserAuthentication() gin.HandlerFunc {
 			context.JSON(200, gin.H{
 				"message": "No session token, please login again",
 			})
+			context.Abort()
 			return
 		}
 		trueUserId, err := handlers.RedisClient.Get(sessionToken).Result()
@@ -37,20 +40,24 @@ func UserAuthentication() gin.HandlerFunc {
 			context.JSON(200, gin.H{
 				"message": "Invalid session token, please login again",
 			})
+			context.Abort()
 			return
 		}
+		handlers.RedisClient.Expire(sessionToken, time.Second*3600)
 		userIdNum, err := strconv.Atoi(userId)
 		trueUserIdNum, err := strconv.Atoi(trueUserId)
 		if err != nil {
 			context.JSON(200, gin.H{
 				"message": "Invalid user id or session token",
 			})
+			context.Abort()
 			return
 		}
 		if userIdNum != trueUserIdNum {
 			context.JSON(200, gin.H{
 				"message": "Invalid user id or session token",
 			})
+			context.Abort()
 			return
 		}
 		context.Set("userId", userIdNum)

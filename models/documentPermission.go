@@ -34,7 +34,14 @@ func (documentPermission *DocumentPermission) Add() error {
 	}
 	return db.Create(documentPermission).Error
 }
-
+func UpdateDocumentPermissionTypeByDocumentIdAndUserId(documentId int, userId int, permissionType bool) error {
+	db := database.GetDB()
+	err := db.Model(&DocumentPermission{}).Where("document_id =? AND user_id =?", documentId, userId).Update("permission_type", permissionType).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func GetPermissionTypeByDocumentIdAndUserId(documentId int, userId int) (int, error) {
 	db := database.GetDB()
 	var permissionType bool
@@ -48,30 +55,34 @@ func GetPermissionTypeByDocumentIdAndUserId(documentId int, userId int) (int, er
 		return 0, nil
 	}
 }
-func GetPermissionTypeAndDocumentIdByUserId(userId int) ([]byte, error) {
-	db := database.GetDB()
-	var documentPermissions []DocumentPermission
-	db.Where("user_id = ? ", userId).Find(&documentPermissions)
-	type DocumentPermissionJson struct {
-		DocumentId     int  `json:"document_id"`
-		PermissionType bool `json:"permission_type"`
-	}
 
-	documentPermissionJsons := make([]DocumentPermissionJson, 0)
-	for _, documentPermission := range documentPermissions {
-		documentPermissionJsons = append(documentPermissionJsons, DocumentPermissionJson{
-			DocumentId:     documentPermission.DocumentId,
-			PermissionType: documentPermission.PermissionType,
-		})
-	}
+/*
+	func GetPermissionTypeAndDocumentIdByUserId(userId int) ([]byte, error) {
+		db := database.GetDB()
+		var documentPermissions []DocumentPermission
+		db.Where("user_id = ? ", userId).Find(&documentPermissions)
+		type DocumentPermissionJson struct {
+			DocumentId     int  `json:"document_id"`
+			PermissionType bool `json:"permission_type"`
+		}
 
-	bytes, err := json.Marshal(documentPermissionJsons)
-	if err != nil {
-		return nil, err
-	}
-	return bytes, nil
+		documentPermissionJsons := make([]DocumentPermissionJson, 0)
+		for _, documentPermission := range documentPermissions {
+			documentPermissionJsons = append(documentPermissionJsons, DocumentPermissionJson{
+				DocumentId:     documentPermission.DocumentId,
+				PermissionType: documentPermission.PermissionType,
+			})
+		}
+
+		bytes, err := json.Marshal(documentPermissionJsons)
+		if err != nil {
+			return nil, err
+		}
+		return bytes, nil
 
 }
+*/
+
 func GetPermissionTypeAndUserIdByDocumentId(documentId int) ([]byte, error) {
 	db := database.GetDB()
 	var documentPermissions []DocumentPermission
@@ -94,4 +105,16 @@ func GetPermissionTypeAndUserIdByDocumentId(documentId int) ([]byte, error) {
 	}
 	return bytes, nil
 
+}
+func DeleteDocumentPermissionByDocumentIdAndUserId(documentId int, userId int) error {
+	db := database.GetDB()
+	var documentPermissions []DocumentPermission
+	err := db.Table("t_document_permission").
+		Joins("left join t_document_info on t_document_info.document_id = t_document_permission.document_id").
+		Find(&documentPermissions).Where("document_id = ? AND user_id = ?", documentId, userId).Delete(&documentPermissions).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

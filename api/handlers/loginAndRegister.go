@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"OnlineDoc/api/authenticate"
+	"OnlineDoc/config"
 	"OnlineDoc/models"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -32,9 +33,15 @@ func HandleLogin(context *gin.Context) {
 			})
 			return
 		}
-		RedisClient.Set(token, strconv.Itoa(trueUser.UserId), time.Second*3600)
+		err = RedisClient.Set(token, strconv.Itoa(trueUser.UserId), time.Second*3600).Err()
+		if err != nil {
+			context.JSON(200, gin.H{
+				"message": "Unable to set session token in redis",
+			})
+			return
+		}
 		//log.Println("Token - UserId generated: ", RedisClient.Get(token).Val())
-		context.SetCookie("session_token", token, 3600, "/", "127.0.0.1:8080", false, true)
+		context.SetCookie("session_token", token, 3600, "/", context.Request.Host, false, true)
 		context.JSON(200, gin.H{
 			"message":       "Login successful",
 			"session_token": token,
@@ -44,10 +51,18 @@ func HandleLogin(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid password",
 		})
+		context.Abort()
 	}
 }
 
 func HandleRegister(context *gin.Context) {
+	if !config.AllowRegistration {
+		context.JSON(200, gin.H{
+			"message": "Registration is disabled",
+		})
+		context.Abort()
+		return
+	}
 	username := context.PostForm("username")
 	password := context.PostForm("password")
 	_, err := models.GetUserByUsername(username)
@@ -57,6 +72,7 @@ func HandleRegister(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Invalid password",
 			})
+			context.Abort()
 			return
 		}
 		user := models.User{
@@ -68,6 +84,7 @@ func HandleRegister(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Unable to create user",
 			})
+			context.Abort()
 			return
 		} else {
 			context.JSON(200, gin.H{

@@ -50,7 +50,18 @@ func (documentInfo *DocumentInfo) Add() int {
 	}
 
 }
-
+func GetDocumentInfoByPermissionTypeByUserId(userId int) (*[]DocumentInfo, error) {
+	db := database.GetDB()
+	var documentInfos []DocumentInfo
+	err := db.Table("t_document_info").
+		Joins("join t_document_permission on t_document_info.document_id = t_document_permission.document_id").
+		Where("t_document_permission.user_id = ?", userId).
+		Find(&documentInfos).Error
+	if err != nil {
+		return nil, err
+	}
+	return &documentInfos, nil
+}
 func GetDocumentInfoById(documentId int) (*DocumentInfo, error) {
 	db := database.GetDB()
 	var documentInfo DocumentInfo

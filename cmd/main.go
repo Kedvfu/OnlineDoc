@@ -40,4 +40,5 @@ func Initialize() {
 	models.InitializeModels()
 	handlers.InitializeRedis()
 	sessions.InitialExcelSessions()
+	config.InitializeApplicationConfig()
 }

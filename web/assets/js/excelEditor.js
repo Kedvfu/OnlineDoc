@@ -1,9 +1,10 @@
 const markdownText = $("#document-content");
-const markdownViewer = $("#document-viewer-container")
-const favouriteBtn = $("#document-info-bar-item-favourite")
-const saveBtn = $("#document-info-bar-item-save")
-const refreshBtn = $("#document-info-bar-item-refresh")
-const currentTitle = $("#document-info-bar-item-title")
+const markdownViewer = $("#document-viewer-container");
+const favouriteBtn = $("#document-info-bar-item-favourite");
+const saveBtn = $("#document-info-bar-item-save");
+const refreshBtn = $("#document-info-bar-item-refresh");
+const currentTitle = $("#document-info-bar-item-title");
+const downloadBtn=$("#document-header-menu-item-download");
 
 
 const viewportHeight = window.innerHeight;
@@ -12,6 +13,8 @@ const initialRowHeight = viewportHeight / 30;
 const initialColumnWidth = 5 * initialRowHeight;
 const excelColumnHeaders = $("#excel-column-headers")
 const excelTable = $("#excel-table")
+
+
 let chosenCellList = []
 let startCell = null;
 let endCell = null;
@@ -71,7 +74,7 @@ const getExcelData = () => {
     });
 }
 const saveExcelDocument = () => {
-    let postData = {}
+    let postData;
     if (currentTitle.text() === pageData.title) {
         postData = {}
     } else {
@@ -100,6 +103,13 @@ const removeUnableCells = () => {
 
     }
 }
+const fetchUserData= (userId,usersString)=>{
+    return $.ajax({
+        url: `/api/user/${userId}/info/${usersString}`,
+        type: 'GET',
+        timeout: 30000
+    });
+}
 const refreshExcelData = () => {
 
     removeUnableCells();
@@ -113,7 +123,7 @@ const refreshExcelData = () => {
         timeout: 3e4,
         dataType: "json",
         data: postData,
-    }).done((data) => {
+    }).done(async (data) => {
         lastRefreshTime = new Date().getTime();
         const updateCells = data.cells;
 
@@ -147,12 +157,20 @@ const refreshExcelData = () => {
 
         }
         for (let [userId, cell] of UpdatedFrom) {
-
+            let userName = "";
+            let user = userMap.get(userId)
+            if (user === undefined) {
+                const users = await fetchUserData(pageData.userId, userId);
+                const user = users[0];
+                userName = user.user_name;
+                userMap.set(userId, user)
+            }
+            userName = user.user_name;
             const cellParent = cell.parent();
             cellParent.addClass("unable-edit-cell");
             cellParent.data("add-time", Math.floor(Date.now() / 1000));
             $(`.user-${userId}-cell`).remove();
-            const OtherUserCell = $(`<div class="other-user-updated-cell user-${userId}-cell"><label class="other-user-updated-cell-label">${userId}正在编辑</label><div class="other-user-updated-cell-border"></div></div>`)
+            const OtherUserCell = $(`<div class="other-user-updated-cell user-${userId}-cell"><label class="other-user-updated-cell-label">${userName}</label><div class="other-user-updated-cell-border"></div></div>`)
             OtherUserCell.css({
                 height: (cell.height() + 2) + "px",
                 width: (cell.width() + 2) + "px",
@@ -160,7 +178,6 @@ const refreshExcelData = () => {
                 top: "-1px"
             });
             cellParent.append(OtherUserCell);
-
         }
         autoRefreshInterval = setInterval(refreshExcelData, refreshTime)
 
@@ -253,9 +270,9 @@ const detectDoubleClick = (event) => {
     removeTextareaAndSaveValue();
     const doubleClickedCell = $(event.target);
     const textareaElement = $("<textarea class='cell-textarea'></textarea>");
-    const doubleClickedCellOffset = doubleClickedCell.offset();
-    const doubleClickedCellHeight = doubleClickedCell.height();
-    const doubleClickedCellWidth = doubleClickedCell.width();
+    // const doubleClickedCellOffset = doubleClickedCell.offset();
+    // const doubleClickedCellHeight = doubleClickedCell.height();
+    // const doubleClickedCellWidth = doubleClickedCell.width();
 
     doubleClickedCell.append(textareaElement);
     textareaElement.focus();
@@ -267,7 +284,7 @@ const removeTextareaAndSaveValue = () => {
     const cellRow = cellRowAndColumn.row;
     const cellColumn = cellRowAndColumn.column;
     textareaElement.remove();
-    if (cellValue) {
+    if (cellValue !== undefined) {
         const postData = {
             "row": cellRow,
             "column": cellColumn,
@@ -295,27 +312,54 @@ initializeExcelTable();
 getExcelData();
 
 
-excelTable.on("mousedown", function (event) {
+excelTable.on("mousedown",  (event)=> {
     detectMouseDown(event);
 });
 
-excelTable.on("mouseover", function (event) {
+excelTable.on("mouseover", (event) =>{
     detectMouseOver(event);
 });
-excelTable.on("mouseup", function (event) {
+excelTable.on("mouseup",(event)=> {
     detectMouseUp(event);
 });
+if (pageData.permissionType) {
+    excelTable.on("dblclick",  (event)=> {
+        detectDoubleClick(event);
+    });
+    saveBtn.on("click", saveExcelDocument);
 
-excelTable.on("dblclick", function (event) {
-    detectDoubleClick(event);
-});
+} else{
+    currentTitle.text(currentTitle.text()+readOnlyMessage);
+}
 
-excelTable.on("keydown", function (event) {
+excelTable.on("keydown",  (event)=> {
     if (event.keyCode === 13) {
         removeTextareaAndSaveValue();
     }
 });
-saveBtn.on("click", saveExcelDocument);
-refreshBtn.on("click", refreshExcelData);
 
+refreshBtn.on("click", refreshExcelData);
+downloadBtn.on("click", ()=> {
+    $.ajax({
+        url: `/api/user/${pageData.userId}/document/${pageData.documentId}/excel/download`,
+        type:`GET`,
+        xhrFields: {
+            responseType: 'blob' // 处理二进制数据
+        },
+    }).done((response, status, xhr)=>{
+       const blob = new Blob([response], { type: xhr.getResponseHeader('Content-Type') });
+        const url = window.URL.createObjectURL(blob);
+
+        // 创建一个临时的链接元素并触发下载
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = xhr.getResponseHeader('Content-Disposition').split('filename=')[1];
+        document.body.appendChild(a);
+        a.click();
+
+        // 清理临时链接
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    })
+})
 let autoRefreshInterval = 0;

@@ -4,7 +4,7 @@ import "time"
 
 type ExcelData struct {
 	ExcelCells  *map[int]*map[int]ExcelCell `json:"excelCells"` // map[row][column]ExcelCell
-	OnlineUsers *[]CellHistory
+	OnlineUsers *[]CellHistory              `json:"-"`
 }
 
 type ExcelCell struct {
@@ -63,19 +63,32 @@ func (excelData *ExcelData) UpdateExcelCell(row int, column int, content string,
 	}
 
 	if excelData.ExcelCells == nil {
+		if content == "" {
+			return
+		}
 		newRow := make(map[int]ExcelCell)
 		newRow[column] = newExcelCell
 		newRows := make(map[int]*map[int]ExcelCell)
 		newRows[row] = &newRow
 		excelData.ExcelCells = &newRows
 	} else {
-
 		if (*excelData.ExcelCells)[row] == nil {
+			if content == "" {
+				return
+			}
 			newRow := make(map[int]ExcelCell)
 			newRow[column] = newExcelCell
 			(*excelData.ExcelCells)[row] = &newRow
 		} else {
+			if content == "" {
+				delete(*(*excelData.ExcelCells)[row], column)
+				if len(*(*excelData.ExcelCells)[row]) == 0 {
+					delete(*excelData.ExcelCells, row)
+				}
+				return
+			}
 			(*(*excelData.ExcelCells)[row])[column] = newExcelCell
+
 		}
 
 	}

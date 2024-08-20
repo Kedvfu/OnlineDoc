@@ -9,7 +9,7 @@ body {
 }
 
 .home-header {
-    display: flex;
+    display: block;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 5%;
@@ -23,16 +23,20 @@ body {
 }
 
 .navbar-links {
-    display: flex;
+    margin-left: auto;
     list-style-type: none;
 
 }
-
+.home-navbar{
+    display: inline-block;
+}
 .navbar-link {
     margin: 0 1rem;
+    display: inline-block;
 }
 
 .navbar-link a {
+
     text-decoration: none;
     color: #333;
     font-weight: 500;
@@ -44,7 +48,8 @@ body {
 }
 
 .auth-buttons {
-    display: flex;
+    display: inline-block;
+    float: right;
     gap: 1rem;
 }
 
@@ -100,6 +105,100 @@ body {
         text-align: center;
     }
 }
+.personal-buttons{
+    display: inline-block;
+    float: right;
+
+}
+/* 登录页 */
+.login-container {
+    background-color: #007bff;
+    display: flex;
+    height: 900px
+}
+.login-form-container{
+    margin: 200px 100px 200px auto;
+    height: 50%;
+    width: 50%;
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 40px;
+}
+
+.login-title{
+    top:30%;
+    font-size: 24px;
+}
+.login-label{
+    display: block;
+    font-size: 18px;
+}
+.login-input{
+    margin: 10px 0;
+    height: 40px;
+    width: 300px;
+    font-size: 18px;
+}
+.login-btn{
+    height: 40px;
+    width: 100px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+/* home 页*/
+
+#document-list {
+    display: block;
+}
+.document-card{
+    float: left;
+
+    margin: 20px;
+    text-decoration: none;
+}
+.document-card-icon-container{
+    margin: 0 auto;
+    height: 100px;
+    width: 100px;
+    border: 1px solid #414141;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.card-dvg-icon{
+    height: 30px;
+    width: 30px;
+    margin: auto;
+    fill: #fff;
+}
+.icon-type-1{
+    background-color: #e5c632;
+}
+.icon-type-2{
+    background-color: #009f02;
+}
+.document-card-title{
+    font-size: 20px;
+    text-align: center;
+    color: #000;
+    display: block;
+}
+.document-card-author{
+    font-size: 16px;
+    text-align: center;
+    color: #6c757d;
+    display: block;
+}
+.document-card-updated{
+    font-size: 12px;
+    text-align: center;
+    color: #6c757d;
+    display: block;
+
+}
+
 
 
 /*document 界面*/
@@ -134,8 +233,23 @@ body {
     font-size: 1.1em;
     margin-left: 10px;
     font-weight: bold;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Non-prefixed version */
 }
-
+.title-textarea{
+    line-height: 30px;
+    resize: none;
+    overflow-x: auto;
+    height: 30px;
+    font-size: 1.1em;
+    width:200px;
+    z-index: 1000;
+}
+.title-textarea::-webkit-scrollbar{
+    display: none;
+}
 /* 右侧项目 */
 .document-info-bar-right-items {
     display: flex;

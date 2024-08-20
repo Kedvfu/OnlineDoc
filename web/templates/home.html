@@ -14,8 +14,18 @@
 {{ template "navbar" .}}
 {{ if .session_token }}
 <div id="document-list">
-  <a href="/document/new/markdown">新建markdown文档</a>
-  <a href="/document/new/excel">新建excel文档</a>
+  <a href="/document/new/markdown" class="document-card">
+    <div class="document-card-icon-container">
+      <div class="document-card-icon icon-type-0"></div>
+    </div>
+    <span class="document-card-title">新建Markdown</span>
+  </a>
+  <a href="/document/new/excel" class="document-card">
+    <div class="document-card-icon-container">
+      <i class="document-card-icon icon-type-0"></i>
+    </div>
+    <span class="document-card-title">新建Excel文档</span>
+  </a>
 </div>
 
 

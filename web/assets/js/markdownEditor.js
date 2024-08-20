@@ -63,12 +63,13 @@ const addFavourite = () => {
 }
 
 const saveDocument =  () =>{
-    let postData = {}
+
+    let postData;
     if (currentTitle.text() === pageData.title) {
         postData = {
             "content": markdownText.val()
         }
-    }else {
+    } else {
         postData = {
             "title": currentTitle.text(),
             "content": markdownText.val()
@@ -85,4 +86,10 @@ const saveDocument =  () =>{
 loadDocument();
 markdownText.on("input", showMarkdown)
 favouriteBtn.on("click", addFavourite)
-saveBtn.on("click", saveDocument)
+if(pageData.permissionType) {
+
+    saveBtn.on("click", saveDocument)
+}else{
+    currentTitle.text(currentTitle.text()+readOnlyMessage);
+    markdownText.attr("readonly", true)
+}

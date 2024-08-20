@@ -20,18 +20,22 @@ func GetUserDocuments(context *gin.Context) {
 		})
 		return
 	}
-	Documents, err := models.GetPermissionTypeAndDocumentIdByUserId(userIdNum)
+	documentInfos, err := models.GetDocumentInfoByPermissionTypeByUserId(userIdNum)
 	if err != nil {
 		context.JSON(200, gin.H{
 			"message": "Unable to get documents for user",
 		})
+		context.Abort()
+		return
 	}
-	if len(Documents) == 0 {
+	if len(*documentInfos) == 0 {
 		context.JSON(200, gin.H{
 			"message": "No documents found for user",
 		})
+		context.Abort()
+		return
 	}
-	context.Data(200, "application/json", Documents)
+	context.JSON(200, *documentInfos)
 }
 
 func SaveDocument(context *gin.Context) {
@@ -44,6 +48,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid document id",
 		})
+		context.Abort()
 		return
 	}
 
@@ -55,6 +60,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Unable to get document info",
 		})
+		context.Abort()
 		return
 	}
 	documentType := documentInfo.DocumentType
@@ -66,6 +72,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid document content",
 		})
+		context.Abort()
 		return
 	}
 	if documentType == 1 {
@@ -75,6 +82,7 @@ func SaveDocument(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Invalid document content",
 			})
+			context.Abort()
 			return
 		}
 	} else if documentType == 2 {
@@ -83,6 +91,7 @@ func SaveDocument(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Unable to parse document content",
 			})
+			context.Abort()
 			return
 		}
 		documentContent.Content = string(excelContent)
@@ -96,6 +105,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Document content cannot be empty",
 		})
+		context.Abort()
 		return
 	}
 	//
@@ -106,6 +116,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "No changes detected in document content",
 		})
+		context.Abort()
 		return
 	}
 	documentContent.DocumentId, err = strconv.Atoi(documentId)
@@ -113,6 +124,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid document id",
 		})
+		context.Abort()
 		return
 	}
 	documentContent.UserId = userIdNum
@@ -122,6 +134,7 @@ func SaveDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Unable to save document content",
 		})
+		context.Abort()
 		return
 	}
 	RedisClient.Set(documentId, string(ContentHash[:]), time.Second*3600)
@@ -132,6 +145,7 @@ func SaveDocument(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Unable to update document title",
 			})
+			context.Abort()
 			return
 		}
 
@@ -170,6 +184,7 @@ func ShowDocumentFromSharePage(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "unable to add permission for user",
 		})
+		context.Abort()
 		return
 	}
 	context.Redirect(301, "/document/"+strconv.Itoa(documentId))
@@ -183,6 +198,7 @@ func GetDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid document id",
 		})
+		context.Abort()
 		return
 	}
 	//documentInfo, err := models.GetDocumentInfoById(documentIdNum)
@@ -199,6 +215,8 @@ func GetDocument(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Unable to parse document users",
 		})
+		context.Abort()
+		return
 	}
 	var contentData string
 	if value, ok := (*sessions.ExcelSessions)[documentIdNum]; ok {
@@ -207,6 +225,7 @@ func GetDocument(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Unable to parse document content",
 			})
+			context.Abort()
 			return
 		}
 		contentData = string(contentDataJson)
@@ -216,12 +235,14 @@ func GetDocument(context *gin.Context) {
 			context.JSON(200, gin.H{
 				"message": "Unable to get document content",
 			})
+			context.Abort()
 			return
 		}
 		if documentContent == nil {
 			context.JSON(200, gin.H{
 				"message": "No document content found",
 			})
+			context.Abort()
 			return
 		}
 		contentData = documentContent.Content
@@ -241,6 +262,7 @@ func GetDocumentLink(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Invalid document id",
 		})
+		context.Abort()
 		return
 	}
 	userId, _ := context.Get("userId")
@@ -250,12 +272,14 @@ func GetDocumentLink(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": "Unable to get permission type for user",
 		})
+		context.Abort()
 		return
 	}
 	if PermissionType == 0 {
 		context.JSON(200, gin.H{
 			"message": "No permission to create link",
 		})
+		context.Abort()
 		return
 	} else if PermissionType == 1 {
 		documentInfo, _ := models.GetDocumentInfoById(documentIdNum)
@@ -267,6 +291,7 @@ func GetDocumentLink(context *gin.Context) {
 				context.JSON(200, gin.H{
 					"message": "Unable to generate link",
 				})
+				context.Abort()
 				return
 			}
 
@@ -276,4 +301,33 @@ func GetDocumentLink(context *gin.Context) {
 			"link": link,
 		})
 	}
+}
+
+func DeleteDocument(context *gin.Context) {
+	userId, _ := context.Get("userId")
+	userIdNum := userId.(int)
+	documentId := context.Param("documentId")
+	documentIdNum, err := strconv.Atoi(documentId)
+	if err != nil {
+		context.JSON(200, gin.H{
+			"message": "Invalid document id",
+		})
+		context.Abort()
+		return
+	}
+	err = models.DeleteDocumentPermissionByDocumentIdAndUserId(documentIdNum, userIdNum)
+
+	if err != nil {
+
+		context.JSON(200, gin.H{
+
+			"message": "Unable to delete document for user",
+		})
+		context.Abort()
+		return
+	}
+	context.JSON(200, gin.H{
+		"status":  1,
+		"message": "Document deleted",
+	})
 }

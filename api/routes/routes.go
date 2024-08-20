@@ -17,16 +17,38 @@ func RegisterRoutes(engine *gin.Engine) {
 			UserApi.Use(middleware.UserAuthentication())
 
 			UserApi.GET("/documents", handlers.GetUserDocuments)
-			UserApi.GET("/info", handlers.GetUserInfo)
+			UserApi.GET("/info/:targetUserId", handlers.GetUserInfo)
 
 			UserDocumentApi := UserApi.Group("/document/:documentId")
 			{
-				UserDocumentApi.POST("/save", handlers.SaveDocument)
+				UserDocumentApi.POST("/permission/:targetUserId/:permissionType", handlers.UpdateUserPermissionType)
+				UserDocumentSaveApi := UserDocumentApi.Group("/save")
+				{
+					UserDocumentSaveApi.Use(middleware.DocumentPermissionMiddleware())
+					UserDocumentSaveApi.POST("/", handlers.SaveDocument)
+				}
+				UserDocumentDeleteApi := UserDocumentApi.Group("/delete")
+				{
+					UserDocumentDeleteApi.Use(middleware.DocumentPermissionMiddleware())
+					UserDocumentDeleteApi.POST("/", handlers.DeleteDocument)
+				}
 				UserDocumentApi.GET("/get", handlers.GetDocument)
+
 				UserDocumentApi.GET("/link", handlers.GetDocumentLink)
+
 				ExcelApi := UserDocumentApi.Group("/excel")
 				{
-					ExcelApi.POST("/update", handlers.UpdateExcel)   //更新单元格
+					ExcelApiUpdateApi := ExcelApi.Group("/update")
+					{
+						ExcelApiUpdateApi.Use(middleware.DocumentPermissionMiddleware())
+						ExcelApiUpdateApi.POST("/", handlers.UpdateExcel)
+					}
+					ExcelApiDownloadApi := ExcelApi.Group("/download")
+					{
+						ExcelApiDownloadApi.Use(middleware.DocumentPermissionMiddleware())
+						ExcelApiDownloadApi.GET("/", handlers.DownloadExcel)
+					}
+
 					ExcelApi.POST("/refresh", handlers.RefreshExcel) //获取更新的单元格
 				}
 

@@ -20,6 +20,7 @@ func CookieMiddleware() gin.HandlerFunc {
 			context.Next()
 			return
 		} else {
+
 			userId, err := userId.Result()
 			// 将数据添加到上下文中
 			if err == nil {

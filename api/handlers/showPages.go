@@ -61,16 +61,14 @@ func ShowLogoutPage(context *gin.Context) {
 
 }
 
-func ShowNewDocumentPage(context *gin.Context) {
-
-}
-
 func ShowDocumentPage(context *gin.Context) {
 	documentId, _ := context.Get("documentId")
 	permissionType, _ := context.Get("permissionType")
 	title, _ := context.Get("title")
 	documentType, _ := context.Get("documentType")
 	userId, _ := context.Get("userId")
+	authorId, _ := context.Get("authorId")
+	authorIdNum, _ := authorId.(int)
 
 	if documentType == 2 {
 		documentIdNum := documentId.(int)
@@ -81,6 +79,7 @@ func ShowDocumentPage(context *gin.Context) {
 				context.JSON(200, gin.H{
 					"message": "Unable to get document content",
 				})
+				context.Abort()
 				return
 			}
 			var excelData models.ExcelData
@@ -93,6 +92,7 @@ func ShowDocumentPage(context *gin.Context) {
 					context.JSON(200, gin.H{
 						"message": "Unable to get document content",
 					})
+					context.Abort()
 					return
 				}
 			}
@@ -103,6 +103,7 @@ func ShowDocumentPage(context *gin.Context) {
 				context.JSON(200, gin.H{
 					"message": "Unable to parse document content",
 				})
+				context.Abort()
 				return
 			}
 
@@ -116,6 +117,7 @@ func ShowDocumentPage(context *gin.Context) {
 	}
 
 	context.HTML(200, "document.html", gin.H{
+		"author_id":      authorIdNum,
 		"user_id":        userId,
 		"document_id":    documentId,
 		"permissionType": permissionType,

@@ -9,17 +9,20 @@
 </head>
 <body>
 {{ template "navbar" .}}
-    <h1>登录页</h1>
+<div class="login-container">
+    <div class="login-form-container">
+    <div class="login-title">登录页</div>
+
     <form action="/login" id="loginForm" method="post">
-        <label for="username">用户名:</label>
-        <input type="text" id="username" name="username" required><br><br>
-        <label for="password">密码:</label>
-        <input type="password" id="password" name="password" required><br><br>
-
+        <label class="login-label" for="username">用户名:</label>
+        <input class="login-input" type="text" id="username" name="username" required><br><br>
+        <label class="login-label" for="password">密码:</label>
+        <input class="login-input" type="password" id="password" name="password" required><br><br>
     </form>
-<button id="loginBtn">登录</button>
-<div id="error-message"></div>
-
+    <button class="login-btn" id="loginBtn">登录</button>
+    <div class="error-message" id="error-message"></div>
+    </div>
+</div>
 </body>
 <script src="/web/assets/js/login.js"></script>
 </html>

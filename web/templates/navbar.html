@@ -5,14 +5,14 @@
     </div>
     <nav class="home-navbar">
         <ul class="navbar-links">
-            <li class="navbar-link"><a href="/intro">介绍</a></li>
-            <li class="navbar-link"><a href="/trial">试用</a></li>
-            <li class="navbar-link"><a href="/help">帮助</a></li>
+            <li class="navbar-link"><a href="#">介绍</a></li>
+            <li class="navbar-link"><a href="#">试用</a></li>
+            <li class="navbar-link"><a href="#">帮助</a></li>
         </ul>
     </nav>
     {{ if .session_token }}
     <div class="personal-buttons">
-        <div id="user-name">{{ .userId }}</div>
+
         <a href="/logout" class="btn logout">登出</a>
     </div>
     {{ else }}

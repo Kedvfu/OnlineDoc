@@ -20,6 +20,7 @@ func DocumentMiddleware() gin.HandlerFunc {
 			var titleResult string
 			var documentTypeResult int
 			//var documentContentResult string
+			var authorIdResult int
 
 			documentId := context.Param("documentId")
 			documentType := context.Param("documentType")
@@ -66,6 +67,7 @@ func DocumentMiddleware() gin.HandlerFunc {
 				documentIdResult = documentId
 				permissionTypeResult = true
 				//documentContentResult = ""
+				authorIdResult = userId.(int)
 			} else {
 
 				documentId, err := strconv.Atoi(documentId)
@@ -86,7 +88,7 @@ func DocumentMiddleware() gin.HandlerFunc {
 				}
 				titleResult = documentInfo.Title
 				documentTypeResult = documentInfo.DocumentType
-
+				authorIdResult = documentInfo.UserId
 				//documentContent, err := models.GetLatestDocumentContent(documentId)
 				//if err != nil {
 				//	context.AbortWithStatusJSON(500, gin.H{"message": "Failed to get document content"})
@@ -103,6 +105,7 @@ func DocumentMiddleware() gin.HandlerFunc {
 			}
 			userIdNum, _ := userId.(int)
 
+			context.Set("authorId", authorIdResult)
 			context.Set("userId", userIdNum)
 			context.Set("documentId", documentIdResult)
 			context.Set("permissionType", permissionTypeResult)
