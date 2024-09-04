@@ -49,7 +49,7 @@ func RegisterRoutes(engine *gin.Engine) {
 						ExcelApiDownloadApi.GET("/", handlers.DownloadExcel)
 					}
 
-					ExcelApi.POST("/refresh", handlers.RefreshExcel) //获取更新的单元格
+					ExcelApi.POST("/refresh", handlers.RefreshExcel)
 				}
 
 			}

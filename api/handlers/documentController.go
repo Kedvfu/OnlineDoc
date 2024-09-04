@@ -6,7 +6,9 @@ import (
 	"OnlineDoc/models"
 	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"strconv"
 	"time"
 )
@@ -111,7 +113,7 @@ func SaveDocument(context *gin.Context) {
 	//
 
 	ContentHash := md5.Sum([]byte(documentContent.Content))
-	currentContentHash := RedisClient.Get(documentId).Val()
+	currentContentHash := RedisClient.Get("documentHash_" + documentId).Val()
 	if currentContentHash == string(ContentHash[:]) {
 		context.JSON(200, gin.H{
 			"message": "No changes detected in document content",
@@ -129,7 +131,9 @@ func SaveDocument(context *gin.Context) {
 	}
 	documentContent.UserId = userIdNum
 	documentContent.Updated = time.Now()
+
 	documentContent.Add()
+
 	if err != nil {
 		context.JSON(200, gin.H{
 			"message": "Unable to save document content",
@@ -137,7 +141,7 @@ func SaveDocument(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	RedisClient.Set(documentId, string(ContentHash[:]), time.Second*3600)
+	RedisClient.Set("documentHash_"+documentId, string(ContentHash[:]), 0)
 
 	if newTitle != "" {
 		err := models.UpdateTitleByDocumentId(documentIdNum, newTitle)
@@ -174,18 +178,23 @@ func ShowDocumentFromSharePage(context *gin.Context) {
 		context.Redirect(200, "/home")
 		return
 	}
+
 	documentPermission := models.DocumentPermission{
 		UserId:         trueUserIdNum,
 		DocumentId:     documentId,
 		PermissionType: false,
 	}
-	err = documentPermission.Add()
+
+	exists, err := documentPermission.Add()
 	if err != nil {
 		context.JSON(200, gin.H{
 			"message": "unable to add permission for user",
 		})
 		context.Abort()
 		return
+	}
+	if !exists {
+		RedisClient.Del("documentUsers_" + strconv.Itoa(documentId))
 	}
 	context.Redirect(301, "/document/"+strconv.Itoa(documentId))
 }
@@ -208,7 +217,38 @@ func GetDocument(context *gin.Context) {
 	//	})
 	//	return
 	//}
-	documentUsersJson, _ := models.GetPermissionTypeAndUserIdByDocumentId(documentIdNum)
+	var documentUsersJson []byte
+
+	documentUsersJsonString, err := RedisClient.Get("documentUsers_" + documentId).Result()
+	if documentUsersJsonString == "No data" {
+		context.JSON(200, gin.H{
+			"message": "Unable to get document users",
+		})
+		context.Abort()
+		return
+	}
+
+	if errors.Is(err, redis.Nil) {
+		documentUsersJson, err = models.GetPermissionTypeAndUserIdByDocumentId(documentIdNum)
+		if documentUsersJson == nil {
+			context.JSON(200, gin.H{
+				"message": "Unable to get document users",
+			})
+			RedisClient.Set("documentUsers_"+documentId, "No data", 0)
+			context.Abort()
+			return
+		}
+		RedisClient.Set("documentUsers_"+documentId, string(documentUsersJson), 0)
+
+	} else if err != nil {
+		context.JSON(200, gin.H{
+			"message": "Unable to get document users",
+		})
+		context.Abort()
+		return
+	} else {
+		documentUsersJson = []byte(documentUsersJsonString)
+	}
 	var jsonData []interface{}
 	err = json.Unmarshal(documentUsersJson, &jsonData)
 	if err != nil {
@@ -220,6 +260,8 @@ func GetDocument(context *gin.Context) {
 	}
 	var contentData string
 	if value, ok := (*sessions.ExcelSessions)[documentIdNum]; ok {
+		value.RWMutex.RLock()
+		defer value.RWMutex.RUnlock()
 		contentDataJson, err := json.Marshal(value)
 		if err != nil {
 			context.JSON(200, gin.H{

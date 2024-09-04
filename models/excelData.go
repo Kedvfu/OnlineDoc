@@ -1,10 +1,14 @@
 package models
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type ExcelData struct {
 	ExcelCells  *map[int]*map[int]ExcelCell `json:"excelCells"` // map[row][column]ExcelCell
 	OnlineUsers *[]CellHistory              `json:"-"`
+	RWMutex     sync.RWMutex                `json:"-"`
 }
 
 type ExcelCell struct {
@@ -41,7 +45,10 @@ func GetEmptyExcelData() *ExcelData {
 
 	return &excelData
 }
+
 func (excelData *ExcelData) UpdateExcelCell(row int, column int, content string, style Style, userId int) {
+	excelData.RWMutex.Lock()
+	defer excelData.RWMutex.Unlock()
 	if excelData.OnlineUsers == nil {
 		newCellHistory := make([]CellHistory, 0)
 		excelData.OnlineUsers = &newCellHistory

@@ -59,7 +59,8 @@ func RefreshExcel(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	refreshExcelData := *(*sessions.ExcelSessions)[documentIdNum].OnlineUsers
+
+	refreshExcelData := (*sessions.ExcelSessions)[documentIdNum]
 
 	var jsonData map[string]float64
 	err = context.ShouldBindJSON(&jsonData)
@@ -72,7 +73,12 @@ func RefreshExcel(context *gin.Context) {
 	}
 	userLastRefreshTime := time.UnixMilli(int64(jsonData["timestamp"]))
 	cellsNeedToUpdate := make([]models.CellHistory, 0)
-	for _, cellHistory := range refreshExcelData {
+
+	RedisClient.Del("document_download_" + strconv.Itoa(documentIdNum))
+
+	refreshExcelData.RWMutex.RLock()
+	defer refreshExcelData.RWMutex.RUnlock()
+	for _, cellHistory := range *refreshExcelData.OnlineUsers {
 		if cellHistory.Time.After(userLastRefreshTime) {
 			cellsNeedToUpdate = append(cellsNeedToUpdate, cellHistory)
 		}
@@ -121,7 +127,7 @@ func DownloadExcel(context *gin.Context) {
 		}
 
 		context.Header("Content-Length", strconv.Itoa(buf.Len()))
-		RedisClient.Set("document_download_"+strconv.Itoa(documentIdNum), buf.Bytes(), 3600*time.Second)
+		RedisClient.Set("document_download_"+strconv.Itoa(documentIdNum), buf.Bytes(), 0)
 
 	} else {
 		fileBytes = BlobFile

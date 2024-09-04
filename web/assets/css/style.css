@@ -205,10 +205,10 @@ body {
 .document-header {
     display: flex;
     align-items: center;
-    background-color: #f8f9fa; /* 背景颜色 */
-    color: #343a40; /* 文本颜色 */
-    padding: 10px 20px; /* 内边距 */
-    height: 60px; /* 固定高度 */
+    background-color: #f8f9fa;
+    color: #343a40;
+    padding: 10px 20px;
+    height: 60px;
 }
 
 .document-info-bar {
@@ -233,10 +233,10 @@ body {
     font-size: 1.1em;
     margin-left: 10px;
     font-weight: bold;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* Internet Explorer/Edge */
-    user-select: none;         /* Non-prefixed version */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .title-textarea{
     line-height: 30px;
@@ -260,7 +260,7 @@ body {
 .document-info-bar-item svg {
     width: 24px;
     height: 24px;
-    fill: none;/* 使用文本颜色填充图标 */
+    fill: none;
     stroke: #597da2;
     cursor: pointer;
 }
@@ -285,21 +285,21 @@ body {
     background-color: #6c757d;
 }
 #document-header-menu {
-    position: fixed; /* 固定位置 */
+    position: fixed;
     top: 60px;
     width: 250px;
     height: 100%;
     background-color: #f8f9fa;
     overflow: hidden;
-    transition: right 0.3s ease-in-out; /* 动画效果 */
-    z-index: 1000; /* 保证覆盖在其他内容之上 */
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
     color: #000;
 }
 .menu-closed{
-    right: -250px; /* 初始位置在右侧看不见的位置 */
+    right: -250px;
 }
 .menu-open{
-    right: 0; /* 打开菜单时，向右移动 */
+    right: 0;
 }
 #document-header-menu-item-share-link{
     white-space: nowrap;
@@ -396,7 +396,7 @@ body {
     width: 14px;
     height: 14px;
 
-    fill: none;/* 使用文本颜色填充图标 */
+    fill: none;
     stroke: currentColor;
 }
 .code-body {
@@ -432,15 +432,15 @@ body {
 
 /*excel 样式*/
 #excel-table{
-    border-collapse: collapse; /* 合并边框 */
+    border-collapse: collapse;
     user-select: none;
-    -webkit-user-select: none; /* 针对 WebKit 内核的浏览器 */
-    -moz-user-select: none; /* 针对 Firefox 浏览器 */
-    -ms-user-select: none; /* 针对 Internet Explorer/Edge */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-drag: none;
-    -webkit-user-drag: none; /* 针对 WebKit 内核的浏览器 */
-    -moz-user-drag: none; /* 针对 Firefox 浏览器 */
-    -ms-user-drag: none; /* 针对 Internet Explorer/Edge */
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;
 }
 .excel-data-cell,.excel-row-header-cell,.excel-column-header-cell {
     border: 1px solid #adadad;
@@ -500,8 +500,8 @@ div.chosen-cell-bottom {
 }
 .other-user-updated-cell{
     position: absolute;
-    border: 2px solid #ff9023; /* 这是外框 */
-    pointer-events: none; /* 确保点击事件不会影响到其他元素 */
+    border: 2px solid #ff9023;
+    pointer-events: none;
     z-index: 1000;
 }
 .other-user-updated-cell-label{

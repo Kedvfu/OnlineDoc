@@ -14,6 +14,10 @@ type DocumentPermission struct {
 
 	PermissionType bool `json:"permission_type" gorm:"type:boolean"` //true for write, false for read
 }
+type DocumentPermissionJson struct {
+	UserId         int  `json:"user_id"`
+	PermissionType bool `json:"permission_type"`
+}
 
 //	func InitializeDocumentPermission() {
 //		db := database.GetDB()
@@ -26,13 +30,13 @@ func (documentPermission *DocumentPermission) TableName() string {
 	return "t_document_permission"
 }
 
-func (documentPermission *DocumentPermission) Add() error {
+func (documentPermission *DocumentPermission) Add() (bool, error) {
 	db := database.GetDB()
 	err := db.Where("document_id =? AND user_id =?", documentPermission.DocumentId, documentPermission.UserId).First(&DocumentPermission{}).Error
 	if err == nil {
-		return nil
+		return true, nil
 	}
-	return db.Create(documentPermission).Error
+	return false, db.Create(documentPermission).Error
 }
 func UpdateDocumentPermissionTypeByDocumentIdAndUserId(documentId int, userId int, permissionType bool) error {
 	db := database.GetDB()
@@ -87,10 +91,7 @@ func GetPermissionTypeAndUserIdByDocumentId(documentId int) ([]byte, error) {
 	db := database.GetDB()
 	var documentPermissions []DocumentPermission
 	db.Where("document_id = ? ", documentId).Find(&documentPermissions)
-	type DocumentPermissionJson struct {
-		UserId         int  `json:"user_id"`
-		PermissionType bool `json:"permission_type"`
-	}
+
 	documentPermissionJsons := make([]DocumentPermissionJson, 0)
 	for _, documentPermission := range documentPermissions {
 		documentPermissionJsons = append(documentPermissionJsons, DocumentPermissionJson{

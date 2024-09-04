@@ -108,10 +108,10 @@ func ShowDocumentPage(context *gin.Context) {
 			}
 
 			currentExcelData := (*sessions.ExcelSessions)[documentIdNum]
-			if currentExcelData.ExcelCells == nil {
+			if currentExcelData == nil {
 				newCellHistory := make([]models.CellHistory, 0)
 				excelData.OnlineUsers = &newCellHistory
-				(*sessions.ExcelSessions)[documentIdNum] = excelData
+				(*sessions.ExcelSessions)[documentIdNum] = &excelData
 			}
 		}
 	}

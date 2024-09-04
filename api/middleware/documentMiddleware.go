@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"OnlineDoc/api/handlers"
 	"OnlineDoc/models"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"time"
@@ -58,10 +60,15 @@ func DocumentMiddleware() gin.HandlerFunc {
 					DocumentId:     documentId,
 					PermissionType: true,
 				}
-				err := documentPermission.Add()
+				_, err := documentPermission.Add()
 				if err != nil {
 					context.AbortWithStatusJSON(500, gin.H{"message": "Failed to create new document permission"})
 				}
+				documentUsersJson, _ := json.Marshal(models.DocumentPermissionJson{
+					UserId:         userId.(int),
+					PermissionType: true,
+				})
+				handlers.RedisClient.Set("documentUsers_"+strconv.Itoa(documentId), documentUsersJson, 0)
 
 				titleResult = documentInfo.Title
 				documentIdResult = documentId
@@ -76,6 +83,7 @@ func DocumentMiddleware() gin.HandlerFunc {
 					return
 				}
 				permissionType, err := models.GetPermissionTypeByDocumentIdAndUserId(documentId, userId.(int))
+
 				if err != nil {
 					context.AbortWithStatusJSON(500, gin.H{"message": "No permission for this document"})
 					return

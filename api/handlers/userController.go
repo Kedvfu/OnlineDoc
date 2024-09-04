@@ -4,8 +4,6 @@ import (
 	"OnlineDoc/models"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"time"
-
 	"strconv"
 	"strings"
 )
@@ -42,7 +40,7 @@ func GetUserInfo(context *gin.Context) {
 				context.Abort()
 				return
 			}
-			RedisClient.Set("user_"+userID, userJson, 3600)
+			RedisClient.Set("user_"+userID, userJson, 0)
 		} else {
 			user := models.User{}
 			err := json.Unmarshal([]byte(userJson), &user)
@@ -54,7 +52,7 @@ func GetUserInfo(context *gin.Context) {
 				return
 			}
 			userList = append(userList, user)
-			RedisClient.Expire("user_"+userID, time.Second*3600)
+			RedisClient.Expire("user_"+userID, 0)
 		}
 	}
 	context.JSON(200, userList)

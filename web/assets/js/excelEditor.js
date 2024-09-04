@@ -5,6 +5,7 @@ const saveBtn = $("#document-info-bar-item-save");
 const refreshBtn = $("#document-info-bar-item-refresh");
 const currentTitle = $("#document-info-bar-item-title");
 const downloadBtn=$("#document-header-menu-item-download");
+const autoSaveCheckbox = $("#document-header-menu-item-auto-save")
 
 
 const viewportHeight = window.innerHeight;
@@ -144,7 +145,7 @@ const refreshExcelData = () => {
         }
         if (UpdatedFrom.size === 0) {
             refreshCount++;
-            if (refreshCount > 20) {
+            if (refreshCount > 6) {
                 refreshTime = 10000;
                 clearInterval(autoRefreshInterval)
                 autoRefreshInterval = setInterval(refreshExcelData, refreshTime)
@@ -186,10 +187,9 @@ const refreshExcelData = () => {
 const columnNumberToLetter = (column) => {
     let columnLetter = '';
     while (column > 0) {
-        // 获取当前列的最后一个字母
+
         let remainder = (column - 1) % 26;
         columnLetter = String.fromCharCode(65 + remainder) + columnLetter;
-        // 更新列号
         column = Math.floor((column - remainder) / 26);
     }
     return columnLetter;
@@ -344,20 +344,19 @@ downloadBtn.on("click", ()=> {
         url: `/api/user/${pageData.userId}/document/${pageData.documentId}/excel/download`,
         type:`GET`,
         xhrFields: {
-            responseType: 'blob' // 处理二进制数据
+            responseType: 'blob'
         },
     }).done((response, status, xhr)=>{
        const blob = new Blob([response], { type: xhr.getResponseHeader('Content-Type') });
         const url = window.URL.createObjectURL(blob);
 
-        // 创建一个临时的链接元素并触发下载
+
         const a = document.createElement('a');
         a.href = url;
         a.download = xhr.getResponseHeader('Content-Disposition').split('filename=')[1];
         document.body.appendChild(a);
         a.click();
 
-        // 清理临时链接
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     })
